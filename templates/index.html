@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRISSOOO's Portfolio</title>
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <main class="hero">
+        <div class="content">
+            <div class="profile-wrapper">
+                <div class="profile-ring"></div>
+                {% if user_profile and user_profile.image_filename %}
+                    <img src="{{ url_for('static', filename='uploads/' + user_profile.image_filename) }}" 
+                        alt="Profile Photo" class="profile-img-popout">
+                {% else %}
+                    <div class="circle-backdrop"></div>
+                {% endif %}
+            </div>
+
+            <svg viewBox="0 0 1200 120" class="title-svg" preserveAspectRatio="xMidYMid meet">
+                <defs>
+                    <linearGradient id="strokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#2b5288" stop-opacity="0.95" />
+                        <stop offset="100%" stop-color="#e2ba41" stop-opacity="0.95" />
+                    </linearGradient>
+                </defs>
+                <text x="50%" y="75%" text-anchor="middle" class="svg-text">
+                    KRISSOOO
+                </text>
+            </svg>
+        </div>
+    </main>
+
+    <!-- Content Section Directly Below -->
+    <!-- Content Section Directly Below -->
+<section id="content-section" class="scroll-section">
+    <div class="section-container">
+
+        <!-- Left Text Content: Reads strictly from user_profile.about_text -->
+        <div class="text-content">
+            <h2>About Krissooo</h2>
+            <p>
+                {% if user_profile and user_profile.about_text %}
+                    {{ user_profile.about_text }}
+                {% else %}
+                    Welcome to my PEAKFOLIO! Where I place my content, projects, and latest blogs here. 
+                    An Infotech Student who still yearns for everything, but hypin' up on a sudden case. Mesmerize 
+                    thoughout a peculiar day with optimistic mind and childlike pace.
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Right Square Image Card: Reads strictly from user_profile.about_image -->
+        <div class="section-card">
+            {% if user_profile and user_profile.about_image %}
+                <img src="{{ url_for('static', filename='uploads/' + user_profile.about_image) }}" 
+                     alt="About Photo" 
+                     class="card-img">
+            {% else %}
+                <!-- Fallback image if no about image is uploaded yet -->
+                <img src="{{ url_for('static', filename='images/mirror.png') }}" 
+                     alt="Default Photo" class="card-img">
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+    <!-- Dynamic Image Gallery Section -->
+    <section id="gallery-section" class="scroll-section">
+        <div class="sticky-wrapper">
+            <div class="standalone-gallery-container">
+                
+                <!-- Card Stack (Left) -->
+                <div class="card-stack" id="cardStack" onclick="swipeCard()">
+                    {% if cards %}
+                        {% for card in cards %}
+                        <div class="card card-{{ loop.index }}" 
+                             data-title="{{ card.title }}" 
+                             data-caption="{{ card.caption }}">
+                            <span class="card-badge">{{ card.badge if card.badge else 'Project' }}</span>
+                            <img src="{{ url_for('static', filename='uploads/' + card.image_filename) }}" alt="{{ card.title }}">
+                            <div class="card-overlay">
+                                <span class="card-tag">Project 0{{ loop.index }}</span>
+                                <h3>{{ card.title }}</h3>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <!-- Fallback cards -->
+                        <div class="card card-1" data-title="Portfolio Design" data-caption="Tap the card on the left to swipe through my project showcases and highlights.">
+                            <span class="card-badge">Featured</span>
+                            <img src="{{ url_for('static', filename='images/self.png') }}" alt="Card 1">
+                            <div class="card-overlay">
+                                <span class="card-tag">Project 01</span>
+                                <h3>Portfolio Design</h3>
+                            </div>
+                        </div>
+                        <div class="card card-2" data-title="Full Stack App" data-caption="A web app built using Flask backend and interactive cards gallery interface.">
+                            <span class="card-badge">Web Dev</span>
+                            <img src="{{ url_for('static', filename='images/bg.jpg') }}" alt="Card 2">
+                            <div class="card-overlay">
+                                <span class="card-tag">Project 02</span>
+                                <h3>Full Stack App</h3>
+                            </div>
+                        </div>
+                        <div class="card card-3" data-title="Tech Blog" data-caption="Personal blog sharing insights on technology, design, and code developments.">
+                            <span class="card-badge">Article</span>
+                            <img src="{{ url_for('static', filename='images/mirror.png') }}" alt="Card 3">
+                            <div class="card-overlay">
+                                <span class="card-tag">Project 03</span>
+                                <h3>Tech Blog</h3>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Dynamic Text Card (Right) -->
+                <div class="text-card">
+                    <h2 id="projectTitle" class="stroked-title">
+                        {% if cards %}{{ cards[0].title }}{% else %}My Projects{% endif %}
+                    </h2>
+                    <p id="projectCaption">
+                        {% if cards %}{{ cards[0].caption }}{% else %}Tap the card on the left to swipe through my project showcases and highlights.{% endif %}
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+<div class="section-divider" style="margin: 20px auto 8px auto;"></div>
+
+<!-- Lifestyle Section -->
+<section id="lifestyle-section" class="scroll-section" style="padding-top: 0;">
+    <div class="interests-container">
+        <h2 class="section-title stroked-title" style="margin-top: 0; margin-bottom: 6px;">Passions & Interests</h2>
+        <p class="section-subtitle" style="margin-top: 0; margin-bottom: 25px;">A glimpse into what keeps me inspired outside of coding.</p>
+
+        <div class="interests-grid">
+            
+            <!-- Music Auto-Carousel -->
+            <div class="interest-card auto-carousel" data-interval="3500">
+                <div class="carousel-images">
+                    {% for item in music_slides %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" 
+                         class="{% if loop.first %}active{% endif %}" 
+                         data-title="{{ item.title }}" 
+                         data-caption="{{ item.caption }}" 
+                         alt="{{ item.title }}">
+                    {% else %}
+                    <!-- Fallback if empty -->
+                    <img src="{{ url_for('static', filename='images/mirror.png') }}" class="active" data-title="Synthwave Beats" data-caption="Vibing to retro synthwave while coding.">
+                    {% endfor %}
+                </div>
+                <div class="card-icon"><i class="fa-solid fa-music"></i></div>
+                <div class="card-text-display">
+                    <h3 class="dynamic-title">{% if music_slides %}{{ music_slides[0].title }}{% else %}Synthwave Beats{% endif %}</h3>
+                    <p class="dynamic-caption">{% if music_slides %}{{ music_slides[0].caption }}{% else %}Vibing to retro synthwave while coding.{% endif %}</p>
+                </div>
+            </div>
+
+            <!-- Games Auto-Carousel -->
+            <div class="interest-card auto-carousel" data-interval="4000">
+                <div class="carousel-images">
+                    {% for item in games_slides %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" 
+                         class="{% if loop.first %}active{% endif %}" 
+                         data-title="{{ item.title }}" 
+                         data-caption="{{ item.caption }}" 
+                         alt="{{ item.title }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/bg.jpg') }}" class="active" data-title="Open World" data-caption="Diving into massive virtual worlds.">
+                    {% endfor %}
+                </div>
+                <div class="card-icon"><i class="fa-solid fa-gamepad"></i></div>
+                <div class="card-text-display">
+                    <h3 class="dynamic-title">{% if games_slides %}{{ games_slides[0].title }}{% else %}Open World{% endif %}</h3>
+                    <p class="dynamic-caption">{% if games_slides %}{{ games_slides[0].caption }}{% else %}Diving into massive virtual worlds.{% endif %}</p>
+                </div>
+            </div>
+
+            <!-- Lifestyle Auto-Carousel -->
+            <div class="interest-card auto-carousel" data-interval="4500">
+                <div class="carousel-images">
+                    {% for item in lifestyle_slides %}
+                    <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" 
+                         class="{% if loop.first %}active{% endif %}" 
+                         data-title="{{ item.title }}" 
+                         data-caption="{{ item.caption }}" 
+                         alt="{{ item.title }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/self.png') }}" class="active" data-title="Daily Workflows" data-caption="Balancing tech learning with health.">
+                    {% endfor %}
+                </div>
+                <div class="card-icon"><i class="fa-solid fa-compass"></i></div>
+                <div class="card-text-display">
+                    <h3 class="dynamic-title">{% if lifestyle_slides %}{{ lifestyle_slides[0].title }}{% else %}Daily Workflows{% endif %}</h3>
+                    <p class="dynamic-caption">{% if lifestyle_slides %}{{ lifestyle_slides[0].caption }}{% else %}Balancing tech learning with health.{% endif %}</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Divider Line -->
+<div class="section-divider"></div>
+
+<!-- References & Links Section -->
+<footer id="references-section" class="scroll-section">
+    <div class="references-container">
+        
+        <h2 class="section-title stroked-title">References & Credits</h2>
+        <p class="section-subtitle">Resources, tools, and inspirations used to build this portfolio.</p>
+
+        <div class="references-grid">
+            
+            <!-- Tech Stack Reference Card -->
+            <div class="ref-card">
+                <div class="ref-icon"><i class="fa-solid fa-code"></i></div>
+                <h3>Tech Stack</h3>
+                <ul class="ref-list">
+                    <li><i class="fa-brands fa-python"></i> Flask (Python Backend)</li>
+                    <li><i class="fa-brands fa-html5"></i> HTML5 & CSS3</li>
+                    <li><i class="fa-brands fa-js"></i> Vanilla JavaScript (ES6+)</li>
+                </ul>
+            </div>
+
+            <!-- Design & Assets Reference Card -->
+            <div class="ref-card">
+                <div class="ref-icon"><i class="fa-solid fa-palette"></i></div>
+                <h3>Assets & UI</h3>
+                <ul class="ref-list">
+                    <li><i class="fa-solid fa-icons"></i> FontAwesome 6 (Icons)</li>
+                    <li><i class="fa-solid fa-font"></i> Google Fonts</li>
+                    <li><i class="fa-solid fa-wand-magic-sparkles"></i> Custom CSS Glassmorphism</li>
+                </ul>
+            </div>
+
+            <!-- Socials & Links Card -->
+            <div class="ref-card">
+                <div class="ref-icon"><i class="fa-solid fa-link"></i></div>
+                <h3>Connect</h3>
+                <ul class="ref-list">
+                    <li><a href="{{ user_profile.facebook_url if user_profile and user_profile.facebook_url else 'https://github.com' }}" target="_blank"><i class="fa-brands fa-github"></i> GitHub / Facebook</a></li>
+                    <li><a href="{{ user_profile.instagram_url if user_profile and user_profile.instagram_url else 'https://linkedin.com' }}" target="_blank"><i class="fa-brands fa-linkedin"></i> Instagram / LinkedIn</a></li>
+                    <li><a href="mailto:{{ user_profile.email if user_profile and user_profile.email else 'your-email@example.com' }}"><i class="fa-solid fa-envelope"></i> Contact Me</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="copyright-notice">
+            <p>&copy; 2026 KRISSOOO. Built with passion and curiosity.</p>
+        </div>
+
+    </div>
+</footer>
+
+    {% include 'navbar.html' %}
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+</body>
+</html>

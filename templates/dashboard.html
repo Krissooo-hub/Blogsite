@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Cards & Interests | Portfolio Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="brand">
+                <h2>PEAK<span>ADMIN</span></h2>
+            </div>
+            <nav class="dash-nav">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fa-solid fa-chart-pie"></i> Overview
+                </a>
+                <a href="{{ url_for('dashboard_cards') }}" class="active">
+                    <i class="fa-solid fa-layer-group"></i> Manage Cards
+                </a>
+                <a href="{{ url_for('dashboard_post') }}">
+                    <i class="fa-solid fa-photo-film"></i> Upload Media
+                </a>
+                <a href="{{ url_for('dashboard_profile_page') }}">
+                    <i class="fa-solid fa-user-gear"></i> Profile Settings
+                </a>
+                <a href="{{ url_for('home') }}">
+                    <i class="fa-solid fa-globe"></i> View Portfolio
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <h1>Portfolio Card Manager</h1>
+                <p>Upload and organize images and descriptions for your interactive swipe gallery.</p>
+            </header>
+
+            <!-- SECTION 1: PROJECT CARDS -->
+            <div class="dash-grid">
+                <!-- Upload Form Panel -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-cloud-arrow-up"></i> Upload New Card</h3>
+
+                    <form action="{{ url_for('upload_card') }}" method="POST" enctype="multipart/form-data" class="dash-form">
+                        <div class="form-group">
+                            <label for="title">Project Title</label>
+                            <input type="text" id="title" name="title" placeholder="e.g., Web Development" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="badge">Badge Tag</label>
+                            <input type="text" id="badge" name="badge" placeholder="e.g., Featured, Fullstack, UI/UX">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="caption">Description / Caption</label>
+                            <textarea id="caption" name="caption" rows="3" placeholder="Brief details about this showcase..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Choose Image</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="image" name="image" accept="image/*" required>
+                                <div class="file-dummy">
+                                    <i class="fa-solid fa-image"></i>
+                                    <span>Click or Drag Image Here</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-plus"></i> Add Card
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Active Cards Display -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-images"></i> Active Cards ({{ cards|length }})</h3>
+
+                    <div class="card-list">
+                        {% if cards %}
+                            {% for card in cards %}
+                            <div class="card-item">
+                                <div class="thumb-box">
+                                    <img src="{{ url_for('static', filename='uploads/' + card.image_filename) }}" alt="{{ card.title }}">
+                                </div>
+
+                                <div class="card-info">
+                                    <span class="badge">{{ card.badge }}</span>
+                                    <h4>{{ card.title }}</h4>
+                                    <p>{{ card.caption[:50] }}...</p>
+                                </div>
+
+                                <div class="card-actions">
+                                    <form action="{{ url_for('delete_card', card_id=card.id) }}" method="POST" onsubmit="return confirm('Delete this card?');">
+                                        <button type="submit" class="btn-delete" title="Delete Card">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="empty-msg">No uploaded cards found. Use the form on the left to add your first project card!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: PASSIONS & INTERESTS -->
+            <header class="dash-header" style="margin-top: 50px;">
+                <h1>Passions & Interests Manager</h1>
+                <p>Upload dynamic carousel slides for your Music, Games, and Lifestyle categories.</p>
+            </header>
+
+            <div class="dash-grid">
+                <!-- Upload Interest Slide Panel -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-heart"></i> Add Interest Slide</h3>
+
+                    <form action="{{ url_for('upload_interest') }}" method="POST" enctype="multipart/form-data" class="dash-form">
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category" required style="width: 100%; padding: 12px; border-radius: 8px; background: #1e293b; color: #fff; border: 1px solid rgba(255,255,255,0.1);">
+                                <option value="Music">Music</option>
+                                <option value="Games">Games</option>
+                                <option value="Lifestyle">Lifestyle</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interest_title">Slide Title</label>
+                            <input type="text" id="interest_title" name="title" placeholder="e.g., Synthwave Beats" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="interest_caption">Caption</label>
+                            <textarea id="interest_caption" name="caption" rows="3" placeholder="Brief details about this interest..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Choose Image</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="interest_image" name="image" accept="image/*" required>
+                                <div class="file-dummy">
+                                    <i class="fa-solid fa-image"></i>
+                                    <span>Click or Drag Image Here</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-plus"></i> Add Interest Slide
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Active Interests Display -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-list-check"></i> Active Interest Slides ({% if interests %}{{ interests|length }}{% else %}0{% endif %})</h3>
+
+                    <div class="card-list">
+                        {% if interests %}
+                            {% for item in interests %}
+                            <div class="card-item">
+                                <div class="thumb-box">
+                                    <img src="{{ url_for('static', filename='uploads/' + item.image_filename) }}" alt="{{ item.title }}">
+                                </div>
+
+                                <div class="card-info">
+                                    <span class="badge">{{ item.category }}</span>
+                                    <h4>{{ item.title }}</h4>
+                                    <p>{{ item.caption[:50] }}...</p>
+                                </div>
+
+                                <div class="card-actions">
+                                    <form action="{{ url_for('delete_interest', interest_id=item.id) }}" method="POST" onsubmit="return confirm('Delete this interest slide?');">
+                                        <button type="submit" class="btn-delete" title="Delete Interest">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="empty-msg">No interest slides uploaded yet. Use the form on the left to create one!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,721 @@
+/* 1. Import Jaro from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Jaro:opsz@6..72&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Jaro', sans-serif;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    display: block; /* FIX: Prevents horizontal side-by-side placement */
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: url('../images/bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Content Container */
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+
+/* Profile Elements */
+/* Container Frame */
+.profile-wrapper {
+    position: relative;
+    width: 350px;
+    height: 350px;
+    margin: 0 auto 10px auto;
+    z-index: 2;
+}
+
+/* Outer Glowing Ring */
+.profile-ring {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2980b9, #125168, #9c6815, #f39c12);
+    box-shadow: 0 0 25px rgba(241, 196, 15, 0.4);
+    z-index: 1;
+}
+
+/* Circle Background Filler */
+.circle-backdrop {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: calc(100% - 12px);
+    height: calc(100% - 12px);
+    border-radius: 50%;
+    background-color: rgba(13, 17, 23, 0.85);
+    z-index: 2;
+}
+
+/* Profile Image Setup */
+.profile-img-popout {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 50%;
+    z-index: 10; 
+    pointer-events: none;
+}
+/* SVG Text */
+.title-svg {
+    width: 80vw;
+    max-width: 1000px;
+    height: auto;
+    display: block;
+    margin-top: 50px;
+    margin-left: 10px;
+    z-index: 5;
+}
+
+.svg-text {
+    font-family: 'Jaro', sans-serif;
+    font-size: 120px; 
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    fill: #ffffff;
+    stroke: url(#strokeGradient);
+    stroke-width: 7px;
+    paint-order: stroke fill; 
+    stroke-linejoin: round;
+}
+
+/* Next Section Below Hero */
+
+/* Section that spans 500vh */
+/* Base style for all scroll sections (default: transparent with no container) */
+.scroll-section {
+    min-height: 80vh;
+    width: 100%;
+    position: relative;
+    background: transparent;
+    backdrop-filter: none;
+    box-sizing: border-box;
+}
+
+/* Apply the dark background container ONLY to the very first section */
+.scroll-section:first-of-type {
+    background: linear-gradient(to bottom, rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.98));
+    backdrop-filter: blur(8px);
+}
+
+/* Sticky wrapper to pin content on screen while scrolling */
+.sticky-wrapper {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    padding: 30px 40px 30px 40px; /* Right padding preserves space for fixed sidebar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+/* Section Container arranged horizontally */
+.section-container {
+    max-width: 1100px;
+    width: 100%;
+    margin: 60px auto 50px auto; /* 60px top margin pushes it down */
+    padding: 50px 30px;
+    box-sizing: border-box;
+    color: #ffffff;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+/* Left Text Container */
+.text-content {
+    flex: 1;
+    min-width: 0; /* Keeps text inside bounds without pushing parent container */
+    text-align: left;
+}
+
+.text-content h2 {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 2.5rem; /* Adjusted for better proportion */
+    color: #f39c12;
+    -webkit-text-fill-color: #f39c12;
+    -webkit-text-stroke: 3px #061e40;
+    paint-order: stroke fill; 
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.text-content p {
+    font-size: 1.15rem; /* Scaled down from 2.0rem so paragraphs fit cleanly */
+    line-height: 1.7;
+    color: #e0e0e0;
+    text-align: justify;
+}
+
+/* Right Image Card */
+.section-card {
+    width: 360px;
+    height: 480px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.section-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 12px;
+    display: block;
+}
+
+/* Glassmorphism Card for Text Content */
+.text-card {
+    flex: 1;
+    width: 100%;
+    max-width: 600px;                     /* WIDER: Increased from 500px to 620px */
+    min-height: 500px;                    /* TALLER: Sets a solid minimum height */
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;              /* Centers text vertically inside the larger card */
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    padding: 50px 45px;                   /* WIDER/TALLER SPACING: Increased inner padding */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    text-align: left;
+}
+/* Header Text Styling */
+.text-card h2 {
+    font-size: 3.0rem;
+    color: #f39c12;
+    margin-top: -150px;
+    letter-spacing: 2px;
+    -webkit-text-stroke: 3px #061e40;
+    paint-order: stroke fill;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Description Text Styling */
+.text-card p {
+    font-size: 1.25rem;
+    margin-top: 70px;
+    line-height: 1.6;
+    color: #e2e8f0;
+    font-family: 'Playfair Display', sans-serif; /* Clean font for paragraph body */
+    letter-spacing: 0.5px;
+}
+
+
+/* Card Container */
+.card-stack {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Base Card Design */
+.card {
+    position: absolute;
+    width: 120%;
+    height: 130%;
+    margin-top: -70px;
+    margin-left: -100px;
+    border-radius: 24px;
+    overflow: hidden;
+    background: rgba(42, 35, 15, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), 
+                opacity 0.5s ease, 
+                z-index 0.5s ease,
+                border-color 0.3s ease;
+}
+
+.card:hover {
+    border-color: rgba(243, 156, 18, 0.6);
+}
+
+/* Card Image */
+.card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    transition: transform 0.5s ease;
+}
+
+.card:hover img {
+    transform: scale(1.05); /* Gentle zoom effect on hover */
+}
+
+/* Badge Tag (Top Right) */
+.card-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+/* Dark Gradient Overlay for Text Readability */
+.card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 20px 20px 24px 20px;
+    background: linear-gradient(to top, rgba(2, 6, 23, 0.95) 0%, rgba(2, 6, 23, 0.4) 60%, transparent 100%);
+    box-sizing: border-box;
+    z-index: 4;
+    text-align: left;
+}
+
+.card-tag {
+    font-size: 0.8rem;
+    color: #f39c12;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.card-overlay h3 {
+    margin: 4px 0 0 0;
+    font-size: 1.3rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* Stack Staging (Front to Back) */
+.card-1 {
+    transform: translateY(0) scale(1);
+    z-index: 3;
+    opacity: 1;
+}
+
+.card-2 {
+    transform: translateY(18px) scale(0.92);
+    z-index: 2;
+    opacity: 0.82;
+}
+
+.card-3 {
+    transform: translateY(36px) scale(0.84);
+    z-index: 1;
+    opacity: 0.6;
+}
+
+/* Swipe Animation */
+.card.swiping {
+    animation: swipeRight 0.5s forwards ease-in-out;
+}
+
+@keyframes swipeRight {
+    0% {
+        transform: translateX(0) rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: translateX(120%) rotate(12deg);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translateX(0) translateY(36px) scale(0.84);
+        opacity: 0.6;
+    }
+}
+
+
+
+/* Container holding cards on left and text on right */
+.standalone-gallery-container {
+    max-width: 1100px;
+    width: 100%;
+    margin-right: -70px;
+    color: #f3f0f0;
+    display: flex;
+    flex-direction: row; /* Aligns items horizontally */
+    align-items: center;
+    justify-content: space-between;
+    gap: 100px;
+}
+/* Right Text Styling */
+.text-content {
+    flex: 1;
+    text-align: left;
+}
+
+.text-content .stroked-title {
+    font-size: 1.9rem;
+    color: #f39c12;
+    margin-bottom: 20px;
+    letter-spacing: 2px;
+    -webkit-text-stroke: 2px #2b5288;
+    paint-order: stroke fill;
+}
+
+.text-content p {
+    font-size: 1.5rem;
+    line-height: 1.7;
+    font-family: 'Playfair Display', sans-serif; /* Clean font for paragraph body */
+    color: #e0e0e0;
+}
+
+/* Card Stack dimensions */
+.card-stack {
+    position: relative;
+    width: 500px;
+    height: 380px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* Ensure sections scroll naturally without overlapping */
+#lifestyle-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 100px 20px 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5;
+}
+
+/* Container limits width and centers content */
+.interests-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.interests-container .section-title {
+    font-size: 3rem;
+    color: #f39c12;
+    margin-bottom: 8px;
+    letter-spacing: 2px;
+    -webkit-text-stroke: 1.5px #2b5288;
+    paint-order: stroke fill;
+}
+
+.interests-container .section-subtitle {
+    font-size: 1.1rem;
+    color: #cbd5e1;
+    margin-bottom: 50px;
+}
+
+/* Horizontal 3-Column Grid */
+.interests-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: stretch; /* Forces all cards to match height across the row */
+    gap: 30px;
+    width: 100%;
+}
+
+/* Individual Card Sizing - Fixed Dimensions */
+.interest-card {
+    flex: 1;
+    min-width: 280px;
+    max-width: 360px;
+    height: 460px; /* Locked fixed height so cards never grow or shrink */
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 25px 20px;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden; /* Prevents long dynamic content from pushing layout */
+}
+
+/* Image Container Fixed Aspect Ratio */
+.carousel-images {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    flex-shrink: 0; /* Prevents image box from resizing */
+}
+
+.carousel-images img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.carousel-images img.active {
+    opacity: 1;
+}
+
+/* Dynamic Text Layout Pinning */
+/* Card Icon Styling & Size */
+.card-icon {
+    flex-shrink: 0;
+    margin-top: 5px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card-icon i {
+    font-size: 2.0rem; /* Adjust this value up (e.g., 1.8rem or 2rem) if you want them even bigger */
+    color: #0c65a5;    /* Accents the icon with your golden theme color */
+    filter: drop-shadow(0 0 6px rgba(236, 234, 231, 0.4)); /* Optional subtle glow */
+}
+
+.card-text-display {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.card-text-display .dynamic-title {
+    margin: 0 0 6px 0;
+    font-size: 1.2rem;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.card-text-display .dynamic-caption {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+
+    /* Standard line-clamp property for modern compatibility */
+    line-clamp: 3;
+
+    /* Vendor-prefixed properties required by WebKit engine browsers */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Compact Glowing Divider Line */
+.section-divider {
+    width: 80%;
+    max-width: 900px;
+    height: 1px;
+    margin: 20px auto 8px auto; 
+    background: linear-gradient(
+        90deg, 
+        rgba(43, 82, 136, 0) 0%, 
+        rgba(243, 156, 18, 0.7) 50%, 
+        rgba(43, 82, 136, 0) 100%
+    );
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.4);
+}
+
+#lifestyle-section {
+    padding-top: 0px;
+}
+
+#lifestyle-section h2,
+#lifestyle-section .section-title {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+
+
+
+
+
+/* References Section */
+#references-section {
+    position: relative;
+    width: 100%;
+    padding: 30px 20px 80px; /* Bottom padding gives room above the navbar */
+    box-sizing: border-box;
+}
+
+.references-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.references-grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Glass Ref Card */
+.ref-card {
+    flex: 1;
+    min-width: 260px;
+    max-width: 340px;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    padding: 25px 20px;
+    text-align: left;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.ref-card:hover {
+    transform: translateY(-5px);
+    border-color: #f39c12;
+}
+
+.ref-card .ref-icon {
+    font-size: 1.8rem;
+    color: #f39c12;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.ref-card h3 {
+    font-size: 1.2rem;
+    color: #ffffff;
+    margin-bottom: 15px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+}
+
+.ref-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ref-list li {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ref-list li i {
+    color: #f39c12;
+    width: 18px;
+    text-align: center;
+}
+
+.ref-list a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.ref-list a:hover {
+    color: #f39c12;
+}
+
+/* Footer Bottom Text */
+.copyright-notice {
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+
+
+
+
+
+
+
+

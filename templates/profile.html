@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KRISSOOO | Profile</title>
+  <!-- Page & Component Stylesheets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="profile-body">
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-top">
+      <a href="{{ url_for('home') }}" class="nav-icon" title="Home">
+        <i class="fa-solid fa-house"></i>
+      </a>
+      <a href="#" class="nav-icon" title="Projects">
+        <i class="fa-solid fa-layer-group"></i>
+      </a>
+      <a href="{{ url_for('blog') }}" class="nav-icon" title="Blog">
+        <i class="fa-solid fa-circle-play"></i>
+      </a>
+      <a href="{{ url_for('profile') }}" class="nav-icon" title="Profile">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
+    </div>
+
+    <div class="nav-bottom">
+      <a href="{{ url_for('dashboard') }}" class="nav-icon" title="Dashboard">
+        <i class="fa-solid fa-border-all"></i>
+      </a>
+    </div>
+  </nav>
+
+  <main class="profile-hero">
+    <div class="profile-grid">
+      
+      <!-- Top Header Title -->
+      <div class="profile-header">
+        <h1 class="header-title">
+          <span class="text-blue">KRISSOOO</span> 
+          <span class="text-gold">a.k.a</span>
+        </h1>
+      </div>
+
+      <!-- About Me Glass Card -->
+      <div class="glass-card card-about">
+        <h2 class="card-heading">About Me</h2>
+        <div class="info-list">
+          <p><strong>NAME:</strong> {{ user_profile.name if user_profile else 'CHRIST GABRIEL V. CELESTE' }}</p>
+          <p><strong>AGE:</strong> {{ user_profile.age if user_profile else '20 YEARS OLD' }}</p>
+          <p><strong>EMAIL:</strong> {{ user_profile.email if user_profile else 'CYNATOPHER@EMAIL.COM' }}</p>
+          <p><strong>STATUS:</strong> {{ user_profile.status if user_profile else 'SINGLE' }}</p>
+          <p><strong>GRADUATED:</strong> {{ user_profile.graduated if user_profile else 'BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY' }}</p>
+        </div>
+      </div>
+
+      <!-- Hobbies Glass Card -->
+      <div class="glass-card card-hobbies">
+        <h2 class="card-heading">Hobbies</h2>
+        <p>{{ user_profile.hobbies if user_profile and user_profile.hobbies else 'No hobbies added yet.' }}</p>
+      </div>
+
+      <!-- Biography Glass Card -->
+      <div class="glass-card card-biography">
+        <h2 class="card-heading">Biography</h2>
+        <p>{{ user_profile.biography if user_profile and user_profile.biography else 'No biography added yet.' }}</p>
+      </div>
+
+      <!-- Profile Photo & Socials Card -->
+      <div class="glass-card card-picture">
+        <div class="photo-frame">
+          <img src="{{ url_for('static', filename='uploads/' + user_profile.image_filename) if user_profile and user_profile.image_filename and user_profile.image_filename != 'self.png' else url_for('static', filename='images/self.png') }}" 
+               alt="{{ user_profile.name if user_profile else 'Profile Photo' }}" 
+               class="profile-photo">
+        </div>
+        <h3 class="role-subtitle">Information Technology</h3>
+        <hr class="divider">
+        
+        <div class="social-links">
+            {% if user_profile and user_profile.facebook_url %}
+                <a href="{{ user_profile.facebook_url }}" target="_blank" class="social-icon facebook"><i class="fa-brands fa-facebook"></i></a>
+            {% endif %}
+
+            {% if user_profile and user_profile.instagram_url %}
+                <a href="{{ user_profile.instagram_url }}" target="_blank" class="social-icon instagram"><i class="fa-brands fa-instagram"></i></a>
+            {% endif %}
+
+            {% if user_profile and user_profile.tiktok_url %}
+                <a href="{{ user_profile.tiktok_url }}" target="_blank" class="social-icon tiktok"><i class="fa-brands fa-tiktok"></i></a>
+            {% endif %}
+
+            {% if user_profile and user_profile.discord_url %}
+                <a href="{{ user_profile.discord_url }}" target="_blank" class="social-icon discord"><i class="fa-brands fa-discord"></i></a>
+            {% endif %}
+
+            {% if user_profile and user_profile.linkedin_url %}
+                <a href="{{ user_profile.linkedin_url }}" target="_blank" class="social-icon linkedin"><i class="fa-brands fa-linkedin"></i></a>
+            {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

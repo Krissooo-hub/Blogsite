@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Post Manager | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="brand">
+                <h2>PEAK<span>ADMIN</span></h2>
+            </div>
+            <nav class="dash-nav">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fa-solid fa-chart-pie"></i> Overview
+                </a>
+                <a href="{{ url_for('dashboard_cards') }}">
+                    <i class="fa-solid fa-layer-group"></i> Manage Cards
+                </a>
+                <a href="{{ url_for('dashboard_post') }}" class="active">
+                    <i class="fa-solid fa-photo-film"></i> Upload Media
+                </a>
+                <a href="{{ url_for('dashboard_profile_page') }}">
+                    <i class="fa-solid fa-user-gear"></i> Profile Settings
+                </a>
+                <a href="{{ url_for('home') }}">
+                    <i class="fa-solid fa-globe"></i> View Portfolio
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <h1>Media Post Manager</h1>
+                <p>Upload videos (MP4, WEBM) or photos (PNG, JPG) directly to your platform.</p>
+            </header>
+
+            <div class="dash-grid">
+                <!-- Simplified Upload Form -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-cloud-arrow-up"></i> New Media Post</h3>
+
+                    <form action="{{ url_for('upload_media') }}" method="POST" enctype="multipart/form-data" class="dash-form">
+                        
+                        <div class="form-group">
+                            <label>Select File (Image or Video)</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="media-file" name="file" accept="image/*,video/*" required onchange="handleFilePreview(event)">
+                                <div class="file-dummy">
+                                    <i class="fa-solid fa-photo-film"></i>
+                                    <span id="file-label">Click or Drag Image/Video Here</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="caption">Caption</label>
+                            <textarea id="caption" name="caption" rows="4" placeholder="Write a caption..." required></textarea>
+                        </div>
+
+                        <!-- Live Media Preview Box -->
+                        <div id="preview-container" class="preview-box hidden">
+                            <img id="img-preview" src="#" alt="Preview" class="hidden">
+                            <video id="video-preview" controls class="hidden"></video>
+                        </div>
+
+                        <button type="submit" class="btn-submit">
+                            <i class="fa-solid fa-upload"></i> Post Media
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Active Uploads List -->
+                <div class="dash-card">
+                    <h3><i class="fa-solid fa-folder-open"></i> Uploaded Media ({{ uploads|length }})</h3>
+
+                    <div class="card-list">
+                        {% if uploads %}
+                            {% for item in uploads %}
+                            <div class="card-item">
+                                <div class="thumb-box">
+                                    {% if item.media_type == 'image' %}
+                                        <img src="{{ url_for('static', filename='uploads/' + item.filename) }}" alt="Media">
+                                    {% else %}
+                                        <video src="{{ url_for('static', filename='uploads/' + item.filename) }}" muted></video>
+                                    {% endif %}
+                                </div>
+
+                                <div class="card-info">
+                                    <span class="badge">POST ({{ item.media_type|upper }})</span>
+                                    <p>{{ item.caption }}</p>
+                                </div>
+
+                                <div class="card-actions">
+                                    <form action="{{ url_for('delete_media', upload_id=item.id) }}" method="POST" onsubmit="return confirm('Delete this media file?');">
+                                        <button type="submit" class="btn-delete" title="Delete Media">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="empty-msg">No media uploads found. Use the form to post videos or images!</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Preview Handling -->
+    <script>
+        function handleFilePreview(event) {
+            const input = event.target;
+            const previewContainer = document.getElementById('preview-container');
+            const imgPreview = document.getElementById('img-preview');
+            const videoPreview = document.getElementById('video-preview');
+            const fileLabel = document.getElementById('file-label');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                fileLabel.innerText = file.name;
+
+                const url = URL.createObjectURL(file);
+                previewContainer.classList.remove('hidden');
+
+                if (file.type.startsWith('image/')) {
+                    videoPreview.classList.add('hidden');
+                    videoPreview.src = '';
+                    imgPreview.src = url;
+                    imgPreview.classList.remove('hidden');
+                } else if (file.type.startsWith('video/')) {
+                    imgPreview.classList.add('hidden');
+                    imgPreview.src = '#';
+                    videoPreview.src = url;
+                    videoPreview.classList.remove('hidden');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

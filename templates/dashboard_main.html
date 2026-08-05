@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Overview | PEAK ADMIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1e293b;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .stat-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+        }
+        .stat-details h3 {
+            font-size: 2rem;
+            margin: 0;
+            color: #fff;
+        }
+        .stat-details p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .action-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .overview-action-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .overview-action-card:hover {
+            transform: translateY(-4px);
+            border-color: #f59e0b;
+        }
+        .overview-action-card i {
+            font-size: 2.2rem;
+            color: #f59e0b;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .overview-action-card h3 {
+            margin: 0 0 10px 0;
+            color: #fff;
+            font-size: 1.25rem;
+        }
+        .overview-action-card p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <div class="brand">
+                <h2>PEAK<span>ADMIN</span></h2>
+            </div>
+            <nav class="dash-nav">
+                <a href="{{ url_for('dashboard') }}" class="active"><i class="fa-solid fa-chart-pie"></i> Overview</a>
+                <a href="{{ url_for('dashboard_cards') }}"><i class="fa-solid fa-layer-group"></i> Manage Cards</a>
+                <a href="{{ url_for('dashboard_post') }}"><i class="fa-solid fa-photo-film"></i> Upload Media</a>
+                <a href="{{ url_for('dashboard_profile_page') }}"><i class="fa-solid fa-user-gear"></i> Profile Settings</a>
+                <a href="{{ url_for('home') }}">
+                    <i class="fa-solid fa-globe"></i> View Portfolio
+                </a>
+                
+                <!-- Logout Link -->
+                <a href="{{ url_for('logout') }}" style="color: #ef4444; margin-top: 20px;">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Dashboard Content -->
+        <main class="dashboard-content">
+            <header class="dash-header">
+                <h1>Control Center</h1>
+                <p>Welcome back! Here is a summary of your portfolio content and available tools.</p>
+            </header>
+
+            <!-- STATS OVERVIEW -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <div class="stat-details">
+                        <h3>{{ card_count }}</h3>
+                        <p>Project Cards</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-heart"></i></div>
+                    <div class="stat-details">
+                        <h3>{{ interest_count }}</h3>
+                        <p>Interest Slides</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fa-solid fa-photo-film"></i></div>
+                    <div class="stat-details">
+                        <h3>{{ media_count }}</h3>
+                        <p>Media Posts</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACCESS TILES -->
+            <div class="action-cards-grid">
+                <a href="{{ url_for('dashboard_cards') }}" class="overview-action-card">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <h3>Manage Cards & Interests</h3>
+                    <p>Add, update, or remove portfolio project cards and dynamic passion carousel slides.</p>
+                </a>
+
+                <a href="{{ url_for('dashboard_post') }}" class="overview-action-card">
+                    <i class="fa-solid fa-photo-film"></i>
+                    <h3>Upload Media</h3>
+                    <p>Post high-resolution images or videos directly to your interactive showcase feed.</p>
+                </a>
+
+                <a href="{{ url_for('dashboard_profile_page') }}" class="overview-action-card">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <h3>Profile Settings</h3>
+                    <p>Edit personal details, update profile image, and manage social links seamlessly.</p>
+                </a>
+
+                <a href="{{ url_for('home') }}" target="_blank" class="overview-action-card">
+                    <i class="fa-solid fa-globe"></i>
+                    <h3>Live Preview</h3>
+                    <p>Open your live site in a new tab to view changes as visitors will see them.</p>
+                </a>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

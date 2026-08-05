@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRISSOOO's Blog</title>
+    <!-- Page & Component Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/blogpage.css') }}">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="blog-body">
+
+    <!-- Navigation Sidebar -->
+    <nav class="sidebar">
+        <div class="nav-top">
+            <a href="{{ url_for('home') }}" class="nav-icon" title="Home">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="#" class="nav-icon" title="Projects">
+                <i class="fa-solid fa-layer-group"></i>
+            </a>
+            <a href="{{ url_for('blog') }}" class="nav-icon" title="Blog">
+                <i class="fa-solid fa-circle-play"></i>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-icon" title="Profile">
+                <i class="fa-regular fa-circle-user"></i>
+            </a>
+        </div>
+
+        <div class="nav-bottom">
+            <a href="{{ url_for('dashboard') }}" class="nav-icon" title="Dashboard">
+                <i class="fa-solid fa-border-all"></i>
+            </a>
+        </div>
+    </nav>
+
+
+    <!-- Main Content Area -->
+    <main class="feed-container">
+        
+        <div class="page-header">
+            <h1><i class="fa-solid fa-newspaper"></i> Activity Feed</h1>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="filter-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+            <a href="{{ url_for('blog', category='all') }}" 
+            class="tab-btn {% if active_category == 'all' or not active_category %}active{% endif %}">
+            <i class="fa-solid fa-border-all"></i> All Posts
+            </a>
+            <a href="{{ url_for('blog', category='image') }}" 
+            class="tab-btn {% if active_category == 'image' %}active{% endif %}">
+            <i class="fa-solid fa-image"></i> Photos
+            </a>
+            <a href="{{ url_for('blog', category='video') }}" 
+            class="tab-btn {% if active_category == 'video' %}active{% endif %}">
+            <i class="fa-solid fa-video"></i> Videos
+            </a>
+            <a href="{{ url_for('blog', category='text') }}" 
+            class="tab-btn {% if active_category == 'text' %}active{% endif %}">
+            <i class="fa-solid fa-align-left"></i> Text Only
+            </a>
+        </div>
+
+        <!-- Feed Items Stream -->
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post-card">
+                    
+                    <div class="post-card-header">
+                        <img src="{{ url_for('static', filename='uploads/' + user_profile.image_filename) if user_profile and user_profile.image_filename and user_profile.image_filename != 'self.png' else url_for('static', filename='images/self.png') }}" 
+                             alt="User Avatar" class="user-avatar">
+                        <div class="post-user-info">
+                            <h4>{{ user_profile.name if user_profile and user_profile.name else 'Krissooo' }}</h4>
+                            <span>
+                                <i class="fa-regular fa-clock"></i> 
+                                {% if post.created_at %}
+                                    {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                {% else %}
+                                    Just now
+                                {% endif %}
+                                {% if post.badge %} • {{ post.badge }}{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if post.caption %}
+                        <div class="post-content-text">
+                            {{ post.caption }}
+                        </div>
+                    {% endif %}
+
+                    {% if post.filename and post.filename != 'none' %}
+                        <div class="post-media-container">
+                            {% if post.media_type == 'image' %}
+                                <img src="{{ url_for('static', filename='uploads/' + post.filename) }}" alt="Post media">
+                            {% elif post.media_type == 'video' %}
+                                <video controls style="width:100%;">
+                                    <source src="{{ url_for('static', filename='uploads/' + post.filename) }}">
+                                    Your browser does not support video playback.
+                                </video>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center; color: #64748b; margin-top: 40px;">No posts yet. Publish something from your PEAKADMIN dashboard!</p>
+        {% endif %}
+
+    </main>
+
+</body>
+</html>

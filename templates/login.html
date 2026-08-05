@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | PEAK ADMIN</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <style>
+        .login-body {
+            background-color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .login-card {
+            background: #1e293b;
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+        .login-card h2 {
+            color: #fff;
+            margin-top: 0;
+            text-align: center;
+        }
+        .login-card h2 span { color: #f59e0b; }
+        .alert-error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Input field colors and browser autofill overrides */
+        .dash-form input[type="text"],
+        .dash-form input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            background: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-sizing: border-box;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+        }
+
+        /* Back button styling */
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s ease;
+        }
+        .back-link:hover {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body class="login-body">
+
+    <div class="login-card">
+        <h2>PEAK<span>ADMIN</span></h2>
+        <p style="color: #94a3b8; text-align: center; margin-bottom: 25px;">Please sign in to access control panel</p>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert-error">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="{{ url_for('login') }}" method="POST" class="dash-form">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="btn-submit" style="margin-top: 15px; width: 100%;">
+                <i class="fa-solid fa-right-to-bracket"></i> Log In
+            </button>
+        </form>
+
+        <!-- Exit / Go Back to Main Site -->
+        <a href="{{ url_for('home') }}" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Back to Portfolio
+        </a>
+    </div>
+
+</body>
+</html>

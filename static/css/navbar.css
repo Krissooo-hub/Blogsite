@@ -1,0 +1,59 @@
+/* Sidebar Layout */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0; /* Change to right: 0 if your sidebar is on the right side */
+    height: 100vh;
+    width: 70px;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes .nav-bottom to the very bottom */
+    align-items: center;
+    padding: 30px 0;
+    box-sizing: border-box;
+    z-index: 1000;
+}
+
+/* Icon Groups */
+.nav-top, 
+.nav-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    width: 100%;
+}
+
+/* Base Icon Styling */
+.nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: #94a3b8;
+    text-decoration: none;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    transition: all 0.25s ease;
+}
+
+.nav-icon:hover {
+    color: #f39c12;
+    background: rgba(243, 156, 18, 0.15);
+}
+
+/* Highlight for active/dashboard icon */
+.nav-bottom .nav-icon {
+    color: #f39c12;
+    border: 1px dashed rgba(243, 156, 18, 0.4);
+}
+
+.nav-bottom .nav-icon:hover {
+    background: #f39c12;
+    color: #0f172a;
+    border-color: #f39c12;
+}

@@ -1,0 +1,24 @@
+<nav class="sidebar">
+    <!-- Top Navigation Links -->
+    <div class="nav-top">
+        <a href="{{ url_for('home') }}" class="nav-icon" title="Home">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a href="#" class="nav-icon" title="Projects">
+            <i class="fa-solid fa-layer-group"></i>
+        </a>
+        <a href="{{ url_for('blog') }}" class="nav-icon" title="Blog">
+            <i class="fa-solid fa-circle-play"></i>
+        </a>
+        <a href="{{ url_for('profile') }}" class="nav-icon" title="Profile">
+            <i class="fa-regular fa-circle-user"></i>
+        </a>
+    </div>
+
+    <!-- Bottom Navigation Link -->
+    <div class="nav-bottom">
+        <a href="{{ url_for('dashboard') }}" class="nav-icon" title="Dashboard">
+            <i class="fa-solid fa-border-all"></i>
+        </a>
+    </div>
+</nav>
