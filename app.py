@@ -96,25 +96,25 @@ class Interest(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-# Initialize Database & Default Data
-# --- AFTER ---
-# Initialize Database & Default Data safely
-with app.app_context():
-    try:
-        db.create_all()
-        if not User.query.filter_by(username='krissooo').first():
-            hashed_pw = generate_password_hash('celeste')
-            admin_user = User(username='krissooo', password_hash=hashed_pw)
-            db.session.add(admin_user)
-            db.session.commit()
-        
-        if not UserProfile.query.first():
-            default_profile = UserProfile()
-            db.session.add(default_profile)
-            db.session.commit()
-    except Exception as e:
-        print(f"Database setup error: {e}")
-
+@app.before_request
+def initialize_database():
+    """Runs once safely before processing requests."""
+    if not getattr(app, '_got_first_request', False):
+        try:
+            db.create_all()
+            if not User.query.filter_by(username='krissooo').first():
+                hashed_pw = generate_password_hash('celeste')
+                admin_user = User(username='krissooo', password_hash=hashed_pw)
+                db.session.add(admin_user)
+                db.session.commit()
+            
+            if not UserProfile.query.first():
+                default_profile = UserProfile()
+                db.session.add(default_profile)
+                db.session.commit()
+            app._got_first_request = True
+        except Exception as e:
+            print(f"Database setup error: {e}")
 # --- HELPER FUNCTIONS ---
 
 def allowed_image(filename):
