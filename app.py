@@ -13,12 +13,12 @@ app = Flask(__name__)
 # Configs
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
 
-# Use /tmp directory on Vercel to avoid Read-only file system errors
-if os.environ.get('VERCEL'):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/site.db'
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+# Database Configuration (Fix: Handle external persistent PostgreSQL URL)
+db_url = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
 
@@ -34,6 +34,7 @@ app.config['ALLOWED_IMAGE_EXTS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['ALLOWED_VIDEO_EXTS'] = {'mp4', 'webm', 'ogg', 'mov'}
 
 db = SQLAlchemy(app)
+
 # Login Manager Setup
 login_manager = LoginManager()
 login_manager.init_app(app)
