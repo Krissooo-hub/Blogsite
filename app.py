@@ -5,14 +5,23 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
+import cloudinary
+import cloudinary.uploader
 
 app = Flask(__name__)
 
 # Configs
-app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.environ.get('CLOUDINARY_API_KEY'),
+    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
+)
 
 # File Extensions
 app.config['ALLOWED_IMAGE_EXTS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -62,12 +71,12 @@ class ProjectCard(db.Model):
 
 class MediaUpload(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=True) # Changed to nullable=True
-    caption = db.Column(db.Text, nullable=True)      # Stores your "What's on your mind?" text
+    title = db.Column(db.String(100), nullable=True)
+    caption = db.Column(db.Text, nullable=True)
     badge = db.Column(db.String(50), default="Featured")
-    filename = db.Column(db.String(255), nullable=True) # Changed to nullable=True
-    media_type = db.Column(db.String(10), nullable=True) # 'image', 'video', or 'text'
-    created_at = db.Column(db.DateTime, default=datetime.utcnow) # Helps sort posts by date
+    filename = db.Column(db.String(255), nullable=True)
+    media_type = db.Column(db.String(10), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Interest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -108,6 +117,17 @@ def get_media_type(filename):
         return 'video'
     return None
 
+def save_file(file_obj, prefix=""):
+    """Saves file to Cloudinary on production, or to disk locally."""
+    if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+        res = cloudinary.uploader.upload(file_obj, resource_type="auto")
+        return res.get('secure_url')
+    else:
+        filename = secure_filename(prefix + file_obj.filename)
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        file_obj.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
+
 # --- AUTHENTICATION ROUTES ---
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -142,8 +162,6 @@ def home():
     music_slides = Interest.query.filter_by(category='Music').order_by(Interest.id.desc()).all()
     games_slides = Interest.query.filter_by(category='Games').order_by(Interest.id.desc()).all()
     lifestyle_slides = Interest.query.filter_by(category='Lifestyle').order_by(Interest.id.desc()).all()
-    
-    # Fetch profile details (returns None if table is empty)
     user_profile = UserProfile.query.first()
 
     return render_template(
@@ -155,18 +173,11 @@ def home():
         user_profile=user_profile
     )
 
-
-
-# BLOGPAGE 
 @app.route('/blog')
 def blog():
-    # Get category filter from URL (default to 'all')
     category = request.args.get('category', 'all')
-    
-    # Base query ordered by newest first
     query = MediaUpload.query.order_by(MediaUpload.id.desc())
     
-    # Apply category filters based on media_type
     if category == 'image':
         posts = query.filter_by(media_type='image').all()
     elif category == 'video':
@@ -183,14 +194,11 @@ def blog():
     user_profile = UserProfile.query.first()
     return render_template('blogpage.html', posts=posts, user_profile=user_profile, active_category=category)
 
-
 @app.route('/blog/delete/<int:post_id>', methods=['POST'])
 @login_required
 def delete_blog_post(post_id):
     post = MediaUpload.query.get_or_404(post_id)
-    
-    # Optional: Delete file from physical storage if it exists
-    if post.filename and post.filename != 'none':
+    if post.filename and post.filename != 'none' and not post.filename.startswith('http'):
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], post.filename)
         if os.path.exists(file_path):
             os.remove(file_path)
@@ -200,8 +208,6 @@ def delete_blog_post(post_id):
     flash('Post deleted successfully!')
     return redirect(url_for('dashboard'))
 
-
-# PROFILE
 @app.route('/profile')
 def profile():
     user_profile = UserProfile.query.first()
@@ -221,8 +227,6 @@ def dashboard():
     interest_count = Interest.query.count()
     media_count = MediaUpload.query.count()
     user_profile = UserProfile.query.first()
-    
-    # Fetch all media/blog uploads ordered newest to oldest
     uploads = MediaUpload.query.order_by(MediaUpload.id.desc()).all()
 
     return render_template(
@@ -271,31 +275,20 @@ def update_profile():
     profile_data.hobbies = request.form.get('hobbies', profile_data.hobbies)
     profile_data.biography = request.form.get('biography', profile_data.biography)
     
-    # Social Media Links
     profile_data.facebook_url = request.form.get('facebook_url', profile_data.facebook_url)
     profile_data.instagram_url = request.form.get('instagram_url', profile_data.instagram_url)
     profile_data.tiktok_url = request.form.get('tiktok_url', profile_data.tiktok_url)
     profile_data.discord_url = request.form.get('discord_url', profile_data.discord_url)
     profile_data.linkedin_url = request.form.get('linkedin_url', profile_data.linkedin_url)
-
-    # Homepage About Section Text
     profile_data.about_text = request.form.get('about_text', profile_data.about_text)
 
-    # Profile Avatar Upload
     file = request.files.get('image')
     if file and allowed_image(file.filename):
-        filename = secure_filename("profile_" + file.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        profile_data.image_filename = filename
+        profile_data.image_filename = save_file(file, prefix="profile_")
 
-    # Homepage About Section Photo Upload
     about_file = request.files.get('about_image')
     if about_file and allowed_image(about_file.filename):
-        about_filename = secure_filename("about_" + about_file.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        about_file.save(os.path.join(app.config['UPLOAD_FOLDER'], about_filename))
-        profile_data.about_image = about_filename
+        profile_data.about_image = save_file(about_file, prefix="about_")
 
     db.session.commit()
     flash('Profile updated successfully!')
@@ -310,10 +303,7 @@ def upload_card():
     file = request.files.get('image')
 
     if file and allowed_image(file.filename):
-        filename = secure_filename(file.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
+        filename = save_file(file)
         new_card = ProjectCard(title=title, caption=caption, badge=badge, image_filename=filename)
         db.session.add(new_card)
         db.session.commit()
@@ -324,9 +314,10 @@ def upload_card():
 @login_required
 def delete_card(card_id):
     card = db.get_or_404(ProjectCard, card_id)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], card.image_filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    if card.image_filename and not card.image_filename.startswith('http'):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], card.image_filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     db.session.delete(card)
     db.session.commit()
@@ -341,10 +332,7 @@ def upload_interest():
     file = request.files.get('image')
 
     if file and allowed_image(file.filename):
-        filename = secure_filename(file.filename)
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
+        filename = save_file(file)
         new_interest = Interest(
             category=category,
             title=title,
@@ -360,15 +348,15 @@ def upload_interest():
 @login_required
 def delete_interest(interest_id):
     item = db.get_or_404(Interest, interest_id)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_filename)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    if item.image_filename and not item.image_filename.startswith('http'):
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], item.image_filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('dashboard_cards'))
 
-# UPDATED: Simplified Media Post Route (Only File + Caption required)
 @app.route('/dashboard/post/upload', methods=['POST'])
 @login_required
 def upload_media():
@@ -382,15 +370,13 @@ def upload_media():
         detected_type = get_media_type(file.filename)
         if detected_type:
             media_type = detected_type
-            filename = secure_filename(file.filename)
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = save_file(file)
 
     if caption or filename != "none":
         new_upload = MediaUpload(
-            title="Status Update",  # Default title for DB integrity
+            title="Status Update",
             caption=caption,
-            badge="Post",           # Default badge label
+            badge="Post",
             filename=filename,
             media_type=media_type,
             created_at=datetime.utcnow()
@@ -405,7 +391,7 @@ def upload_media():
 @login_required
 def delete_media(upload_id):
     upload = db.get_or_404(MediaUpload, upload_id)
-    if upload.filename and upload.filename != 'none':
+    if upload.filename and upload.filename != 'none' and not upload.filename.startswith('http'):
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], upload.filename)
         if os.path.exists(file_path):
             os.remove(file_path)
