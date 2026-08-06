@@ -97,18 +97,23 @@ def load_user(user_id):
     return db.session.get(User, int(user_id))
 
 # Initialize Database & Default Data
+# --- AFTER ---
+# Initialize Database & Default Data safely
 with app.app_context():
-    db.create_all()
-    if not User.query.filter_by(username='krissooo').first():
-        hashed_pw = generate_password_hash('celeste')
-        admin_user = User(username='krissooo', password_hash=hashed_pw)
-        db.session.add(admin_user)
-        db.session.commit()
-    
-    if not UserProfile.query.first():
-        default_profile = UserProfile()
-        db.session.add(default_profile)
-        db.session.commit()
+    try:
+        db.create_all()
+        if not User.query.filter_by(username='krissooo').first():
+            hashed_pw = generate_password_hash('celeste')
+            admin_user = User(username='krissooo', password_hash=hashed_pw)
+            db.session.add(admin_user)
+            db.session.commit()
+        
+        if not UserProfile.query.first():
+            default_profile = UserProfile()
+            db.session.add(default_profile)
+            db.session.commit()
+    except Exception as e:
+        print(f"Database setup error: {e}")
 
 # --- HELPER FUNCTIONS ---
 
@@ -407,6 +412,9 @@ def delete_media(upload_id):
     db.session.commit()
     flash('Post deleted successfully!')
     return redirect(url_for('dashboard_post'))
+
+# Enable Vercel serverless execution
+app_handler = app
 
 if __name__ == '__main__':
     app.run(debug=True)
