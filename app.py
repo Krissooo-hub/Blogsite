@@ -12,7 +12,13 @@ app = Flask(__name__)
 
 # Configs
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+
+# Use /tmp directory on Vercel to avoid Read-only file system errors
+if os.environ.get('VERCEL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/site.db'
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static/uploads')
 
@@ -28,7 +34,6 @@ app.config['ALLOWED_IMAGE_EXTS'] = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 app.config['ALLOWED_VIDEO_EXTS'] = {'mp4', 'webm', 'ogg', 'mov'}
 
 db = SQLAlchemy(app)
-
 # Login Manager Setup
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -122,11 +127,12 @@ def save_file(file_obj, prefix=""):
     if os.environ.get('CLOUDINARY_CLOUD_NAME'):
         res = cloudinary.uploader.upload(file_obj, resource_type="auto")
         return res.get('secure_url')
-    else:
+    elif not os.environ.get('VERCEL'):
         filename = secure_filename(prefix + file_obj.filename)
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         file_obj.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return filename
+    return "default.jpg"
 
 # --- AUTHENTICATION ROUTES ---
 
