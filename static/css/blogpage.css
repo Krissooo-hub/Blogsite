@@ -248,21 +248,22 @@ body {
   border-color: #f59e0b;
 }
 
-/* Card Container Styling */
+/* Card Container for Long Text/Essays */
 .essay-card {
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background: #1e293b;
+  border: 1px solid #334155;
   border-radius: 12px;
   padding: 20px;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease;
-  color: #cdd6f4;
+  color: #f8fafc;
   margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .essay-card:hover {
   transform: translateY(-3px);
-  border-color: #89b4fa;
+  border-color: #f59e0b;
 }
 
 .essay-card-header {
@@ -273,8 +274,8 @@ body {
 }
 
 .badge {
-  background: #313244;
-  color: #89b4fa;
+  background: #334155;
+  color: #f59e0b;
   padding: 4px 10px;
   font-size: 0.8rem;
   border-radius: 20px;
@@ -283,7 +284,7 @@ body {
 
 .read-time {
   font-size: 0.8rem;
-  color: #a6adc8;
+  color: #94a3b8;
 }
 
 .essay-title {
@@ -295,10 +296,11 @@ body {
 .essay-snippet {
   font-size: 0.95rem;
   line-height: 1.6;
-  color: #a6adc8;
+  color: #cbd5e1;
   display: -webkit-box;
-  -webkit-line-clamp: 3; /* Limits view to 3 lines on card */
   -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
 }
 
@@ -308,24 +310,29 @@ body {
   align-items: center;
   margin-top: 15px;
   padding-top: 10px;
-  border-top: 1px solid #313244;
+  border-top: 1px solid #334155;
+}
+
+.essay-card-footer .date {
+  font-size: 0.85rem;
+  color: #94a3b8;
 }
 
 .read-more-btn {
   background: none;
   border: none;
-  color: #89b4fa;
+  color: #f59e0b;
   font-weight: 600;
   cursor: pointer;
 }
 
-/* Modal Popup Overlay */
+/* Modal Popup Overlay - MUST BE DISPLAY NONE BY DEFAULT */
 .essay-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -334,16 +341,16 @@ body {
 
 /* Modal Content Box */
 .essay-modal-content {
-  background: #181825;
-  border: 1px solid #45475a;
+  background: #0f172a;
+  border: 1px solid #334155;
   border-radius: 16px;
   width: 100%;
-  max-width: 800px;
+  max-width: 750px;
   max-height: 85vh;
   overflow-y: auto;
   padding: 30px;
   position: relative;
-  color: #cdd6f4;
+  color: #f8fafc;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
@@ -354,7 +361,7 @@ body {
   background: none;
   border: none;
   font-size: 2rem;
-  color: #a6adc8;
+  color: #94a3b8;
   cursor: pointer;
 }
 
@@ -363,9 +370,20 @@ body {
 }
 
 .full-essay-body {
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.8;
-  color: #bac2de;
+  color: #cbd5e1;
   margin-top: 20px;
   word-wrap: break-word;
+  text-indent: 2.5rem; /* Creates paragraph indentation */
 }
+
+textarea[name="caption"] {
+  min-height: 250px; /* Adjust height as needed */
+  resize: vertical;  /* Allows the user to manually drag and resize the box vertically */
+}
+
+.tox-notifications-container {
+    display: none !important;
+}
+

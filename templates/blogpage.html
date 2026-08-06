@@ -19,7 +19,7 @@
             <a href="{{ url_for('home') }}" class="nav-icon" title="Home">
                 <i class="fa-solid fa-house"></i>
             </a>
-            <a href="#" class="nav-icon" title="Projects">
+            <a href="{{ url_for('project') }}" class="nav-icon" title="Projects">
                 <i class="fa-solid fa-layer-group"></i>
             </a>
             <a href="{{ url_for('blog') }}" class="nav-icon" title="Blog">
@@ -37,7 +37,6 @@
         </div>
     </nav>
 
-
     <!-- Main Content Area -->
     <main class="feed-container">
         
@@ -48,109 +47,170 @@
         <!-- Category Filter Tabs -->
         <div class="filter-tabs" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
             <a href="{{ url_for('blog', category='all') }}" 
-            class="tab-btn {% if active_category == 'all' or not active_category %}active{% endif %}">
-            <i class="fa-solid fa-border-all"></i> All Posts
+               class="tab-btn {% if active_category == 'all' or not active_category %}active{% endif %}">
+                <i class="fa-solid fa-border-all"></i> All Posts
             </a>
             <a href="{{ url_for('blog', category='image') }}" 
-            class="tab-btn {% if active_category == 'image' %}active{% endif %}">
-            <i class="fa-solid fa-image"></i> Photos
+               class="tab-btn {% if active_category == 'image' %}active{% endif %}">
+                <i class="fa-solid fa-image"></i> Photos
             </a>
             <a href="{{ url_for('blog', category='video') }}" 
-            class="tab-btn {% if active_category == 'video' %}active{% endif %}">
-            <i class="fa-solid fa-video"></i> Videos
+               class="tab-btn {% if active_category == 'video' %}active{% endif %}">
+                <i class="fa-solid fa-video"></i> Videos
             </a>
             <a href="{{ url_for('blog', category='text') }}" 
-            class="tab-btn {% if active_category == 'text' %}active{% endif %}">
-            <i class="fa-solid fa-align-left"></i> Text Only
+               class="tab-btn {% if active_category == 'text' %}active{% endif %}">
+                <i class="fa-solid fa-align-left"></i> Text Only
             </a>
         </div>
-
-        <!-- Blog Post Card Container -->
-<div class="essay-card" onclick="openEssayModal('essay-modal-{{ post.id }}')">
-  <div class="essay-card-header">
-    <span class="badge">Essay / Article</span>
-    <span class="read-time">~1,000 Words</span>
-  </div>
-
-  <h3 class="essay-title">{{ post.title or 'Untitled Essay' }}</h3>
-
-  <!-- Truncated preview snippet -->
-  <div class="essay-snippet">
-    {{ post.caption[:250] }}...
-  </div>
-
-  <div class="essay-card-footer">
-    <span class="date">{{ post.created_at.strftime('%b %d, %Y') }}</span>
-    <button type="button" class="read-more-btn">Read Full Essay &rarr;</button>
-  </div>
-</div>
-
-<!-- Full Essay Modal (Hidden by Default) -->
-<div id="essay-modal-{{ post.id }}" class="essay-modal-overlay" onclick="closeEssayModal(event, 'essay-modal-{{ post.id }}')">
-  <div class="essay-modal-content">
-    <button class="close-btn" onclick="closeEssayModalDirect('essay-modal-{{ post.id }}')">&times;</button>
-    
-    <div class="modal-header">
-      <span class="badge">Full Essay</span>
-      <h2>{{ post.title or 'Untitled Essay' }}</h2>
-      <p class="post-meta">Posted on {{ post.created_at.strftime('%B %d, %Y') }}</p>
-    </div>
-
-    <!-- Full 1k Essay Text with line breaks preserved -->
-    <div class="full-essay-body">
-      {{ post.caption | replace('\n', '<br>') | safe }}
-    </div>
-  </div>
-</div>
 
         <!-- Feed Items Stream -->
         {% if posts %}
             {% for post in posts %}
-                <div class="post-card">
+                
+                {# Render as Clickable Essay Card if caption is long (over 300 chars) #}
+                {% if post.caption and post.caption|length > 300 %}
                     
-                    <div class="post-card-header">
-                        <img src="{{ url_for('static', filename='uploads/' + user_profile.image_filename) if user_profile and user_profile.image_filename and user_profile.image_filename != 'self.png' else url_for('static', filename='images/self.png') }}" 
-                             alt="User Avatar" class="user-avatar">
-                        <div class="post-user-info">
-                            <h4>{{ user_profile.name if user_profile and user_profile.name else 'Krissooo' }}</h4>
-                            <span>
-                                <i class="fa-regular fa-clock"></i> 
+                    <!-- Blog Essay Card Container -->
+                    <div class="essay-card" onclick="openEssayModal('essay-modal-{{ post.id }}')">
+                        <div class="essay-card-header">
+                            <span class="badge">{{ post.badge or 'Essay / Article' }}</span>
+                            <span class="read-time">~{{ (post.caption.split()|length / 200)|round|int if (post.caption.split()|length / 200)|round|int > 0 else 1 }} min read</span>
+                        </div>
+
+                        <!-- Main Title -->
+                        <h3 class="essay-title">
+                            {% if post.title and post.title != 'Untitled Post' %}
+                                {{ post.title }}
+                            {% else %}
+                                Rethinking Software Security: Secure Engineering, System Isolation, and AI Responsibility
+                            {% endif %}
+                        </h3>
+
+                        <!-- Truncated preview snippet -->
+                        <div class="essay-snippet">
+                            {{ post.caption[:280] }}...
+                        </div>
+
+                        <div class="essay-card-footer">
+                            <span class="date">
                                 {% if post.created_at %}
-                                    {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {{ post.created_at.strftime('%b %d, %Y') }}
                                 {% else %}
                                     Just now
                                 {% endif %}
-                                {% if post.badge %} • {{ post.badge }}{% endif %}
                             </span>
+                            <button type="button" class="read-more-btn">Read Full Essay &rarr;</button>
                         </div>
                     </div>
 
-                    {% if post.caption %}
-                        <div class="post-content-text">
-                            {{ post.caption }}
-                        </div>
-                    {% endif %}
+                    <!-- Full Essay Modal Popup -->
+                    <div id="essay-modal-{{ post.id }}" class="essay-modal-overlay" onclick="closeEssayModal(event, 'essay-modal-{{ post.id }}')">
+                        <div class="essay-modal-content">
+                            <button class="close-btn" type="button" onclick="closeEssayModalDirect('essay-modal-{{ post.id }}')">&times;</button>
+                            
+                            <div class="modal-header">
+                                <span class="badge">{{ post.badge or 'Full Article' }}</span>
+                                <h2 style="margin-top: 10px; margin-bottom: 8px;">
+                                    {% if post.title and post.title != 'Untitled Post' %}
+                                        {{ post.title }}
+                                    {% else %}
+                                        Rethinking Software Security: Secure Engineering, System Isolation, and AI Responsibility
+                                    {% endif %}
+                                </h2>
+                                <p class="post-meta" style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 20px;">
+                                    Posted on 
+                                    {% if post.created_at %}
+                                        {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {% else %}
+                                        Recently
+                                    {% endif %}
+                                </p>
+                            </div>
 
-                    {% if post.filename and post.filename != 'none' %}
-                        <div class="post-media-container">
-                            {% if post.media_type == 'image' %}
-                                <img src="{{ url_for('static', filename='uploads/' + post.filename) }}" alt="Post media">
-                            {% elif post.media_type == 'video' %}
-                                <video controls style="width:100%;">
-                                    <source src="{{ url_for('static', filename='uploads/' + post.filename) }}">
-                                    Your browser does not support video playback.
-                                </video>
-                            {% endif %}
+                            <!-- Formatted Article Content with First-Line Paragraph Indentation -->
+                            <div class="full-essay-body" style="text-indent: 2.5rem;">
+                                {{ post.caption | replace('\n', '<br>') | safe }}
+                            </div>
                         </div>
-                    {% endif %}
+                    </div>
 
-                </div>
+                {% else %}
+
+                    <!-- Standard Post Card (Photos, Videos, Short Status Updates) -->
+                    <div class="post-card">
+                        
+                        <div class="post-card-header">
+                            <img src="{% if user_profile and user_profile.image_filename %}{% if user_profile.image_filename.startswith('http') %}{{ user_profile.image_filename }}{% else %}{{ url_for('static', filename='uploads/' + user_profile.image_filename) }}{% endif %}{% else %}{{ url_for('static', filename='images/self.png') }}{% endif %}" 
+                                 alt="User Avatar" class="user-avatar">
+                            <div class="post-user-info">
+                                <h4>{{ user_profile.name if user_profile and user_profile.name else 'Krissooo' }}</h4>
+                                <span>
+                                    <i class="fa-regular fa-clock"></i> 
+                                    {% if post.created_at %}
+                                        {{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                                    {% else %}
+                                        Just now
+                                    {% endif %}
+                                    {% if post.badge %} • {{ post.badge }}{% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        {% if post.caption %}
+                            <div class="post-content-text">
+                                {{ post.caption | replace('\n', '<br>') | safe }}
+                            </div>
+                        {% endif %}
+
+                        {% if post.filename and post.filename != 'none' %}
+                            <div class="post-media-container">
+                                {% set media_url = post.filename if post.filename.startswith('http') else url_for('static', filename='uploads/' + post.filename) %}
+                                {% if post.media_type == 'image' %}
+                                    <img src="{{ media_url }}" alt="Post media">
+                                {% elif post.media_type == 'video' %}
+                                    <video controls style="width:100%;">
+                                        <source src="{{ media_url }}">
+                                        Your browser does not support video playback.
+                                    </video>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                {% endif %}
+
             {% endfor %}
         {% else %}
-            <p style="text-align: center; color: #64748b; margin-top: 40px;">No posts yet. Publish something from your PEAKADMIN dashboard!</p>
+            <p style="text-align: center; color: #64748b; margin-top: 40px;">No posts yet. Publish something from your dashboard!</p>
         {% endif %}
 
     </main>
 
+    <!-- Modal JavaScript Handler -->
+    <script>
+        function openEssayModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeEssayModalDirect(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function closeEssayModal(event, modalId) {
+            if (event.target.classList.contains('essay-modal-overlay')) {
+                closeEssayModalDirect(modalId);
+            }
+        }
+    </script>
 </body>
 </html>

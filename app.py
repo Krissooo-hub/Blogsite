@@ -273,8 +273,10 @@ def dashboard_cards():
 @app.route('/dashboard/post')
 @login_required
 def dashboard_post():
+    edit_id = request.args.get('edit_id', type=int)
+    edit_post = MediaUpload.query.get(edit_id) if edit_id else None
     uploads = MediaUpload.query.order_by(MediaUpload.id.desc()).all()
-    return render_template('dashboard_post.html', uploads=uploads)
+    return render_template('dashboard_post.html', uploads=uploads, edit_post=edit_post)
 
 @app.route('/dashboard/profile')
 @login_required
@@ -425,6 +427,38 @@ def upload_media():
     else:
         flash('Cannot post an empty status or essay.')
 
+    return redirect(url_for('dashboard_post'))
+
+@app.route('/dashboard/post/update/<int:upload_id>', methods=['POST'])
+@login_required
+def update_media(upload_id):
+    upload = db.get_or_404(MediaUpload, upload_id)
+    title = request.form.get('title', 'Untitled Post')
+    caption = request.form.get('caption', '')
+    badge = request.form.get('badge', 'Post')
+    file = request.files.get('file')
+
+    upload.title = title if title.strip() else "Untitled Post"
+    upload.caption = caption
+    upload.badge = badge
+
+    if file and file.filename != '':
+        detected_type = get_media_type(file.filename)
+        if detected_type:
+            # Remove old file if it exists locally
+            if upload.filename and upload.filename != 'none' and not upload.filename.startswith('http'):
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], upload.filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+            upload.media_type = detected_type
+            upload.filename = save_file(file)
+        else:
+            flash('Unsupported file extension.')
+            return redirect(url_for('dashboard_post', edit_id=upload_id))
+
+    db.session.commit()
+    flash('Updated successfully!')
     return redirect(url_for('dashboard_post'))
 
 @app.route('/dashboard/post/delete/<int:upload_id>', methods=['POST'])
