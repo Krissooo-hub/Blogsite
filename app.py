@@ -122,7 +122,9 @@ def allowed_image(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_IMAGE_EXTS']
 
 def get_media_type(filename):
-    ext = filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+    if not filename or '.' not in filename:
+        return None
+    ext = filename.rsplit('.', 1)[1].lower()
     if ext in app.config['ALLOWED_IMAGE_EXTS']:
         return 'image'
     elif ext in app.config['ALLOWED_VIDEO_EXTS']:
@@ -130,14 +132,25 @@ def get_media_type(filename):
     return None
 
 def save_file(file_obj, prefix=""):
-    if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-        res = cloudinary.uploader.upload(file_obj, resource_type="auto")
-        return res.get('secure_url')
-    elif not os.environ.get('VERCEL'):
+    cloud_name = os.environ.get('CLOUDINARY_CLOUD_NAME')
+    api_key = os.environ.get('CLOUDINARY_API_KEY')
+    api_secret = os.environ.get('CLOUDINARY_API_SECRET')
+
+    if cloud_name and api_key and api_secret:
+        try:
+            res = cloudinary.uploader.upload(file_obj, resource_type="auto")
+            return res.get('secure_url')
+        except Exception as e:
+            print(f"Cloudinary upload error: {e}")
+            flash("Cloudinary upload failed. Please verify API key configuration.")
+            return "default.jpg"
+
+    if not os.environ.get('VERCEL'):
         filename = secure_filename(prefix + file_obj.filename)
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         file_obj.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return filename
+
     return "default.jpg"
 
 # --- AUTHENTICATION ROUTES ---
@@ -319,6 +332,9 @@ def upload_card():
         new_card = ProjectCard(title=title, caption=caption, badge=badge, image_filename=filename)
         db.session.add(new_card)
         db.session.commit()
+        flash('Card uploaded successfully!')
+    else:
+        flash('Invalid image format.')
 
     return redirect(url_for('dashboard_cards'))
 
@@ -333,6 +349,7 @@ def delete_card(card_id):
 
     db.session.delete(card)
     db.session.commit()
+    flash('Card deleted successfully!')
     return redirect(url_for('dashboard_cards'))
 
 @app.route('/dashboard/upload-interest', methods=['POST'])
@@ -353,6 +370,9 @@ def upload_interest():
         )
         db.session.add(new_interest)
         db.session.commit()
+        flash('Interest added successfully!')
+    else:
+        flash('Invalid image format.')
 
     return redirect(url_for('dashboard_cards'))
 
@@ -367,12 +387,15 @@ def delete_interest(interest_id):
 
     db.session.delete(item)
     db.session.commit()
+    flash('Interest deleted successfully!')
     return redirect(url_for('dashboard_cards'))
 
 @app.route('/dashboard/post/upload', methods=['POST'])
 @login_required
 def upload_media():
+    title = request.form.get('title', 'Untitled Post')
     caption = request.form.get('caption', '')
+    badge = request.form.get('badge', 'Post')
     file = request.files.get('file')
 
     filename = "none"
@@ -383,19 +406,24 @@ def upload_media():
         if detected_type:
             media_type = detected_type
             filename = save_file(file)
+        else:
+            flash('Unsupported file extension. Please upload an image or video.')
+            return redirect(url_for('dashboard_post'))
 
     if caption or filename != "none":
         new_upload = MediaUpload(
-            title="Status Update",
+            title=title if title.strip() else "Untitled Post",
             caption=caption,
-            badge="Post",
+            badge=badge,
             filename=filename,
             media_type=media_type,
             created_at=datetime.utcnow()
         )
         db.session.add(new_upload)
         db.session.commit()
-        flash('Media posted successfully!')
+        flash('Published successfully!')
+    else:
+        flash('Cannot post an empty status or essay.')
 
     return redirect(url_for('dashboard_post'))
 

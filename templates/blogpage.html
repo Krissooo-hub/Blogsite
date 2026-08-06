@@ -65,6 +65,44 @@
             </a>
         </div>
 
+        <!-- Blog Post Card Container -->
+<div class="essay-card" onclick="openEssayModal('essay-modal-{{ post.id }}')">
+  <div class="essay-card-header">
+    <span class="badge">Essay / Article</span>
+    <span class="read-time">~1,000 Words</span>
+  </div>
+
+  <h3 class="essay-title">{{ post.title or 'Untitled Essay' }}</h3>
+
+  <!-- Truncated preview snippet -->
+  <div class="essay-snippet">
+    {{ post.caption[:250] }}...
+  </div>
+
+  <div class="essay-card-footer">
+    <span class="date">{{ post.created_at.strftime('%b %d, %Y') }}</span>
+    <button type="button" class="read-more-btn">Read Full Essay &rarr;</button>
+  </div>
+</div>
+
+<!-- Full Essay Modal (Hidden by Default) -->
+<div id="essay-modal-{{ post.id }}" class="essay-modal-overlay" onclick="closeEssayModal(event, 'essay-modal-{{ post.id }}')">
+  <div class="essay-modal-content">
+    <button class="close-btn" onclick="closeEssayModalDirect('essay-modal-{{ post.id }}')">&times;</button>
+    
+    <div class="modal-header">
+      <span class="badge">Full Essay</span>
+      <h2>{{ post.title or 'Untitled Essay' }}</h2>
+      <p class="post-meta">Posted on {{ post.created_at.strftime('%B %d, %Y') }}</p>
+    </div>
+
+    <!-- Full 1k Essay Text with line breaks preserved -->
+    <div class="full-essay-body">
+      {{ post.caption | replace('\n', '<br>') | safe }}
+    </div>
+  </div>
+</div>
+
         <!-- Feed Items Stream -->
         {% if posts %}
             {% for post in posts %}
