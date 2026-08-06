@@ -13,7 +13,7 @@ app = Flask(__name__)
 # Configs
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this-in-production')
 
-# Database Configuration (Fix: Handle external persistent PostgreSQL URL)
+# Database Configuration
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
@@ -96,25 +96,26 @@ class Interest(db.Model):
 def load_user(user_id):
     return db.session.get(User, int(user_id))
 
-@app.before_request
-def initialize_database():
-    """Runs once safely before processing requests."""
-    if not getattr(app, '_got_first_request', False):
-        try:
-            db.create_all()
-            if not User.query.filter_by(username='krissooo').first():
-                hashed_pw = generate_password_hash('celeste')
-                admin_user = User(username='krissooo', password_hash=hashed_pw)
-                db.session.add(admin_user)
-                db.session.commit()
-            
-            if not UserProfile.query.first():
-                default_profile = UserProfile()
-                db.session.add(default_profile)
-                db.session.commit()
-            app._got_first_request = True
-        except Exception as e:
-            print(f"Database setup error: {e}")
+# Safe database initialization routine
+def setup_database():
+    try:
+        db.create_all()
+        if not User.query.filter_by(username='krissooo').first():
+            hashed_pw = generate_password_hash('celeste')
+            admin_user = User(username='krissooo', password_hash=hashed_pw)
+            db.session.add(admin_user)
+            db.session.commit()
+        
+        if not UserProfile.query.first():
+            default_profile = UserProfile()
+            db.session.add(default_profile)
+            db.session.commit()
+    except Exception as e:
+        print(f"Database init warning: {e}")
+
+with app.app_context():
+    setup_database()
+
 # --- HELPER FUNCTIONS ---
 
 def allowed_image(filename):
@@ -129,7 +130,6 @@ def get_media_type(filename):
     return None
 
 def save_file(file_obj, prefix=""):
-    """Saves file to Cloudinary on production, or to disk locally."""
     if os.environ.get('CLOUDINARY_CLOUD_NAME'):
         res = cloudinary.uploader.upload(file_obj, resource_type="auto")
         return res.get('secure_url')
@@ -413,7 +413,6 @@ def delete_media(upload_id):
     flash('Post deleted successfully!')
     return redirect(url_for('dashboard_post'))
 
-# Enable Vercel serverless execution
 app_handler = app
 
 if __name__ == '__main__':
