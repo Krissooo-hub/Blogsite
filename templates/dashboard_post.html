@@ -8,21 +8,46 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 
     <!-- TinyMCE Rich Text Editor CDN -->
-    <script src="https://cdn.tiny.cloud/1/5t0k4n2r3omm45m0pfib64e3c3s8nhl0pnk3ks0z00uocfqr/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        tinymce.init({
-          selector: '#caption_editor',
-          height: 380,
-          skin: 'oxide-dark',
-          content_css: 'dark',
-          plugins: 'lists link code table wordcount fullscreen preview autolink',
-          toolbar: 'undo redo | blocks | bold italic underline strikeThrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link table | fullscreen preview code',
-          menubar: 'file edit view insert format table',
-          content_style: 'body { font-family: Inter, sans-serif; font-size: 15px; background-color: #0f172a; color: #f8fafc; line-height: 1.8; padding: 15px; }'
-        });
-      });
-    </script>
+    <!-- TinyMCE Rich Text Editor CDN -->
+<script 
+    src="https://cdn.tiny.cloud/1/5t0k4n2r3omm45m0pfib64e3c3s8nhl0pnk3ks0z00uocfqr/tinymce/6/tinymce.min.js" 
+    referrerpolicy="origin">
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    tinymce.init({
+        selector: '#caption_editor',
+        height: 380,
+
+        skin: 'oxide-dark',
+        content_css: 'dark',
+
+        plugins: 'lists link code table wordcount fullscreen preview autolink',
+
+        toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link table | fullscreen preview code',
+
+        menubar: 'file edit view insert format table',
+
+        content_style: `
+            body {
+                font-family: Inter, sans-serif;
+                font-size: 15px;
+                background-color: #0f172a;
+                color: #f8fafc;
+                line-height: 1.8;
+                padding: 15px;
+            }
+        `,
+
+        setup: function(editor) {
+            editor.on('change keyup', function() {
+                editor.save();
+            });
+        }
+    });
+});
+</script>
 </head>
 
 <style>
